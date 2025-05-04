@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog Submission Form</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+    .user_email{
+      color: #45a049;
+      position: absolute;
+      top:0;
+      right:0;
+    }
+  </style>
+</head>
+<body>
+  <div class="user_email">
+    <a href="{% url 'load_user_details' %}">
+        <h3>{{ user }}</h3>
+    </a>
+  </div>
+  <form class="form-container"  method="POST" >
+    <h2>Write a Blog</h2>
+    
+
+    {% csrf_token %}
+
+    <label for="title">Blog Title</label>
+    <input type="text" id="title" name="title" placeholder="Enter blog title" required />
+
+
+    <label for="content">Content</label>
+    <textarea id="content" name="content" placeholder="Write your blog content here..." required></textarea>
+
+    <button type="submit">Submit Blog</button>
+  </form>
+  <script>
+    document.querySelector('.form-container').addEventListener('submit', async function (e) {
+      e.preventDefault(); // Stop default form submission
+  
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+  
+      console.log("Title:", title);
+      console.log("Content:", content);
+  
+      // ✅ Get CSRF token from hidden input field
+      const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+  
+      try {
+        const response = await fetch('/dummy/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({
+            title: title,
+            content: content
+          })
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          alert('Blog submitted successfully!');
+          console.log(data);
+        } else {
+          alert('Failed to submit blog.');
+        }
+      } catch (err) {
+        console.error('Submission error:', err);
+      }
+    });
+  </script>
+  
+    
+</body>
+</html>

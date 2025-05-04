@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Blog Detail</title>
+
+    <style>
+        /* Your same beautiful CSS */
+        * { margin: 0;
+            padding: 0;
+             box-sizing: border-box;
+         }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            min-height: 100vh;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { margin-bottom: 40px; color: #333; font-size: 32px; }
+        .blog-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .blog-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        .blog-title, .blog-content {
+            width: 100%;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+        .blog-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .button.update {
+            background-color: #6c63ff;
+            color: white;
+        }
+        .button.update:hover {
+            background-color: #5548ee;
+        }
+        .button.delete {
+            background-color: #ff4b5c;
+            color: white;
+        }
+        .button.delete:hover {
+            background-color: #e03545;
+        }
+        .no-blogs {
+            font-size: 20px;
+            color: #777;
+            text-align: center;
+            margin-top: 40px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    <h1>Welcome, {{ email }}</h1>
+    {% csrf_token %}
+    <div class="blog-container">
+        {% for blog in results %}
+            <div class="blog-card" id="blog-{{ blog.id }}">
+                <input class="blog-title" value="{{ blog.title }}" id="title-{{ blog.id }}">
+                <textarea class="blog-content" id="content-{{ blog.id }}">{{ blog.content }}</textarea>
+
+                <div class="button-group">
+                    <a href="{% url 'edit_document' blog.id %}">edit</a>
+                    <a href="{% url 'delete_data' blog.id %}">Delete</a>
+                    <button onclick="deleteDoc('{{ blog.id }}')">Delete</button>
+                </div>
+            </div>
+        {% empty %}
+            <p class="no-blogs">No blogs found!</p>
+        {% endfor %}
+    </div>
+
+<script>
+function deleteDoc(docId) {
+    axios.delete(`/delete/${docId}/`)
+        .then(response => {
+            if (response.data.status === 'success') {
+                // Remove the deleted document from the DOM
+                const element = document.getElementById(`doc-${docId}`);
+                if (element) {
+                    element.remove();
+                }
+            } else {
+                alert("Error deleting: " + response.data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Delete failed:", error);
+        });
+}
+</script>
+</body>
+</html>
